@@ -137,11 +137,14 @@ a { color: inherit; }
 }
 .combo-input.open,
 .combo-input:focus-within {
-  border-color: color-mix(in srgb, var(--accent-2) 70%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-2) 12%, transparent), var(--shadow-xs);
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), var(--shadow-xs);
+}
+.combo-input:focus-within .combo-native:focus-visible {
+  outline: none;
 }
 .search-icon { color: var(--ink-3); margin-top: 9px; flex-shrink: 0; transition: color 0.2s var(--ease-out); }
-.combo-input:focus-within .search-icon { color: var(--accent-2); }
+.combo-input:focus-within .search-icon { color: #6366f1; }
 .chips-input {
   flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
   padding-top: 2px;
@@ -338,7 +341,7 @@ a { color: inherit; }
   display: flex; align-items: center; justify-content: center;
   color: var(--ink);
   font-weight: 700;
-  opacity: 0.02;
+  opacity: 0.025;
   animation: floatY 9s ease-in-out var(--delay) infinite;
   will-change: transform;
   user-select: none;
@@ -660,7 +663,7 @@ a { color: inherit; }
 
 /* ---------- Focus ---------- */
 button:focus-visible, input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent-2) 70%, transparent);
+  outline: 2px solid rgba(99, 102, 241, 0.6);
   outline-offset: 2px;
   border-radius: 4px;
 }
