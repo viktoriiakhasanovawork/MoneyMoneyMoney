@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>MoneyMoneyMoney — format prices for every market</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='50'%3E💸%3C/text%3E%3C/svg%3E"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet"/>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+:root {
+  --bg: #ffffff;
+  --bg-2: #f5f5f5;
+  --bg-3: #ebebeb;
+  --surface: #ffffff;
+  --ink: #161616;
+  --ink-2: #4d4d4d;
+  --ink-3: #666666;
+  --ink-4: #c8c8c8;
+  --line: #eeeeee;
+  --line-2: #f5f5f5;
+  --accent: #161616;
+  --accent-2: #1f8a5b;
+  --danger: #e40014;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-sm: 10px;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: "Figtree", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 24px 56px -16px rgba(0,0,0,.14), 0 4px 12px rgba(0,0,0,.06);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.015em;
+}
+button { font-family: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; padding: 0; }
+a { color: inherit; }
+
+.app { min-height: 100vh; position: relative; }
+
+/* ---------- Top bar ---------- */
+.top-bar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 32px;
+  backdrop-filter: saturate(1.2) blur(16px);
+  -webkit-backdrop-filter: saturate(1.2) blur(16px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { font-size: 18px; letter-spacing: -3px; filter: saturate(1.1); }
+.brand-name { font-weight: 600; letter-spacing: -0.02em; font-size: 15px; }
+.top-nav { display: flex; gap: 18px; font-size: 14px; color: var(--ink-2); align-items: center; }
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  min-height: calc(100vh - 66px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px 32px 80px;
+  transition: min-height 0.5s var(--ease-out), padding 0.5s var(--ease-out);
+}
+.hero.compact { min-height: auto; padding: 12px 32px 36px; }
+
+
+.hero-inner {
+  width: 100%; max-width: 900px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 40px;
+  position: relative; z-index: 2;
+}
+
+.title-block { text-align: center; transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out); }
+.hero.compact .title-block {
+  opacity: 0; transform: translateY(-10px);
+  height: 0; overflow: hidden; margin: 0; padding: 0; pointer-events: none;
+}
+
+.hero-title {
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  margin: 0 0 20px;
+  text-wrap: balance;
+  color: var(--ink);
+}
+.hero-sub {
+  font-size: 16px; line-height: 1.65;
+  color: var(--ink-3);
+  max-width: 500px; margin: 0 auto;
+  text-wrap: pretty;
+  font-weight: 400;
+}
+
+/* ---------- Search block ---------- */
+.search-block { width: 100%; display: flex; flex-direction: column; gap: 28px; }
+.search-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; }
+.search-row .combobox { flex: 1; min-width: 0; }
+.chips-block { display: flex; flex-direction: column; gap: 22px; }
+.clear-row { display: flex; justify-content: flex-start; margin-top: -6px; }
+
+/* Combobox */
+.combobox { position: relative; width: 100%; }
+.combo-input {
+  display: flex; align-items: flex-start; gap: 12px;
+  min-height: 54px;
+  padding: 9px 14px 9px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+  cursor: text;
+}
+.combo-input.open,
+.combo-input:focus-within {
+  border-color: color-mix(in srgb, var(--accent-2) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-2) 12%, transparent), var(--shadow-xs);
+}
+.search-icon { color: var(--ink-3); margin-top: 9px; flex-shrink: 0; transition: color 0.2s var(--ease-out); }
+.combo-input:focus-within .search-icon { color: var(--accent-2); }
+.chips-input {
+  flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding-top: 2px;
+}
+.combo-native {
+  border: 0; outline: 0; background: transparent;
+  flex: 1; min-width: 140px;
+  font-size: 15px; padding: 6px 2px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.combo-native::placeholder { color: var(--ink-3); }
+.clear-inline {
+  font-size: 12px; color: var(--ink-3);
+  padding: 5px 9px; border-radius: 6px;
+  align-self: flex-start;
+  margin-top: 6px;
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .clear-inline:hover { background: var(--bg-2); color: var(--ink); }
+}
+
+.token {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 5px 5px 10px;
+  background: var(--bg-2);
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+  animation: tokenIn 0.2s var(--ease-out) both;
+  font-weight: 500;
+}
+@keyframes tokenIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.token-flag { font-size: 13px; }
+.token-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  color: var(--ink-3);
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+}
+.token-x:active { transform: scale(0.88); }
+@media (hover: hover) and (pointer: fine) {
+  .token-x:hover { background: var(--ink); color: #fff; }
+}
+
+.combo-pop {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-height: 340px; overflow-y: auto;
+  padding: 6px;
+  z-index: 30;
+  animation: popIn 0.18s var(--ease-out) both;
+}
+@keyframes popIn { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.combo-item {
+  width: 100%; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s var(--ease-out);
+  animation: comboItemIn 0.22s var(--ease-out) both;
+}
+.combo-item:nth-child(1)  { animation-delay: 0ms;  }
+.combo-item:nth-child(2)  { animation-delay: 20ms; }
+.combo-item:nth-child(3)  { animation-delay: 38ms; }
+.combo-item:nth-child(4)  { animation-delay: 54ms; }
+.combo-item:nth-child(5)  { animation-delay: 68ms; }
+.combo-item:nth-child(n+6){ animation-delay: 80ms; }
+@keyframes comboItemIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.combo-item.hover { background: var(--bg-2); }
+.combo-item.active .ci-code { color: var(--ink); font-weight: 600; }
+.ci-flag { font-size: 16px; width: 20px; text-align: center; }
+.ci-name { flex: 1; }
+.ci-dot { color: var(--ink-4); }
+.ci-code { color: var(--ink-3); font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; }
+.ci-check { width: 18px; display: flex; justify-content: center; color: var(--accent-2); }
+.combo-empty { padding: 24px; text-align: center; color: var(--ink-3); font-size: 14px; }
+
+/* ---------- Chip rows ---------- */
+.chip-row { display: flex; flex-direction: column; gap: 12px; }
+.chip-row-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-4);
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.chip-row-label::before,
+.chip-row-label::after {
+  content: '';
+  position: absolute; top: 50%;
+  width: 24px; height: 1px;
+  background: var(--line);
+}
+.chip-row-label::before { right: calc(50% + 68px); }
+.chip-row-label::after  { left:  calc(50% + 68px); }
+.chip-row-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: color 0.12s var(--ease-out), background 0.12s var(--ease-out), border-color 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+  font-weight: 500;
+}
+.app.chip-square .chip { border-radius: 10px; }
+.chip-sym { font-weight: 600; color: var(--ink-2); font-size: 12px; }
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover { background: var(--bg-3); border-color: #d8d8d8; }
+}
+.chip:active { transform: scale(0.96); }
+.chip.chip-on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.chip.chip-on .chip-sym { color: rgba(255,255,255,0.7); }
+
+/* ---------- CTA ---------- */
+.cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 0 22px;
+  min-height: 54px;
+  flex-shrink: 0;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 2px 8px rgba(0,0,0,0.18);
+  transition: transform 0.15s var(--ease-out), background 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover { background: #282828; box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 4px 14px rgba(0,0,0,0.24); }
+}
+.cta:active { transform: scale(0.97); box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 1px 3px rgba(0,0,0,0.1); }
+.cta-off {
+  background: var(--bg-2);
+  color: var(--ink-4);
+  cursor: not-allowed;
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.cta-off:active { transform: none; }
+.cta-badge {
+  background: rgba(255,255,255,0.16);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  text-align: center;
+}
+.ghost-btn {
+  font-size: 13px;
+  color: var(--ink-3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: color 0.12s var(--ease-out), background 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ghost-btn:hover { color: var(--ink); background: var(--bg-2); }
+}
+.ghost-btn:active { transform: scale(0.97); }
+
+/* ---------- Floating symbols ---------- */
+.float-layer {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.float-sym {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink);
+  font-weight: 700;
+  opacity: 0.02;
+  animation: floatY 9s ease-in-out var(--delay) infinite;
+  will-change: transform;
+  user-select: none;
+  transform: translate(-50%, -50%);
+}
+.float-sym span { line-height: 1; }
+@keyframes floatY {
+  0%,100% { transform: translate(-50%, -50%); }
+  50%     { transform: translate(-50%, calc(-50% - 12px)); }
+}
+
+/* ---------- Results ---------- */
+.results { max-width: 1024px; margin: 0 auto; padding: 12px 32px 80px; }
+
+.edit-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0 24px;
+  margin-bottom: 24px;
+}
+.edit-meta { font-size: 13px; color: var(--ink-3); }
+.edit-meta strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.clear-results-btn {
+  font-size: 13px; font-weight: 500;
+  color: var(--ink-2);
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  transition: background 0.12s var(--ease-out), border-color 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .clear-results-btn:hover { background: var(--bg-2); border-color: #d8d8d8; color: var(--ink); }
+}
+.clear-results-btn:active { transform: scale(0.97); }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 820px) {
+  .cards-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Card ---------- */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 20px;
+  transition: border-color 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out), transform 0.22s var(--ease-out);
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  animation: cardIn 0.4s var(--ease-out) both;
+}
+.card-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  color: var(--ink-3);
+  background: transparent;
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+}
+.card-close svg {
+  transition: transform 0.22s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-close:hover { background: var(--bg-2); color: var(--ink); }
+  .card-close:hover svg { transform: rotate(90deg); }
+}
+.card-close:active { transform: scale(0.88); }
+
+/* Card exit animation */
+.card-exit {
+  animation: cardOut 0.28s var(--ease-in-out) both !important;
+  pointer-events: none;
+}
+@keyframes cardOut {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.93) translateY(8px); }
+}
+.card:nth-child(1)  { animation-delay: 0ms; }
+.card:nth-child(2)  { animation-delay: 55ms; }
+.card:nth-child(3)  { animation-delay: 110ms; }
+.card:nth-child(4)  { animation-delay: 165ms; }
+.card:nth-child(5)  { animation-delay: 220ms; }
+.card:nth-child(6)  { animation-delay: 275ms; }
+.card:nth-child(n+7) { animation-delay: 300ms; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-head { display: flex; gap: 14px; align-items: center; }
+.card-flag {
+  font-size: 28px;
+  line-height: 1;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent-2) 8%, white) 0%, var(--bg-2) 100%);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 12%, var(--line));
+  border-radius: 22.37%;
+  flex-shrink: 0;
+}
+.card-head-text { flex: 1; min-width: 0; }
+.card-head-text h3 {
+  font-size: 17px; font-weight: 600;
+  margin: 0 0 5px;
+  letter-spacing: -0.02em;
+}
+.card-cur { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+.card-code {
+  font-family: var(--mono); font-size: 10.5px;
+  background: var(--bg-2);
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.card-sym { font-weight: 600; color: var(--ink); font-size: 14px; }
+
+/* Specs */
+.specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.spec {
+  background: var(--bg-2);
+  padding: 11px 13px;
+  display: flex; flex-direction: column; gap: 4px;
+  animation: specIn 0.4s var(--ease-out) both;
+}
+.spec:nth-child(1) { animation-delay: 80ms; }
+.spec:nth-child(2) { animation-delay: 110ms; }
+.spec:nth-child(3) { animation-delay: 140ms; }
+.spec:nth-child(4) { animation-delay: 170ms; }
+@keyframes specIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.spec-k {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.spec-v { font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* Examples */
+.examples {
+  background: var(--bg-2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.ex-head {
+  display: grid;
+  grid-template-columns: 58px 1fr 1fr;
+  gap: 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  padding: 2px 0 10px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 8px;
+  font-family: var(--sans);
+  font-weight: 500;
+}
+.ex-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 1fr;
+  gap: 12px;
+  padding: 6px 0;
+  align-items: center;
+}
+.ex-label {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.ex-mono { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ex-mono-dim { color: var(--ink-2); }
+
+/* Do/Don't */
+.dodont { display: flex; flex-direction: column; gap: 6px; }
+.dd {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.dd-do {
+  background: color-mix(in srgb, var(--accent-2) 9%, white);
+  color: color-mix(in srgb, var(--accent-2) 80%, black);
+}
+.dd-dont {
+  background: color-mix(in srgb, var(--danger) 6%, white);
+  color: color-mix(in srgb, var(--danger) 75%, black);
+}
+.dd-mark {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px;
+  color: white;
+  flex-shrink: 0;
+}
+.dd-do .dd-mark { background: color-mix(in srgb, var(--accent-2) 80%, black); }
+.dd-dont .dd-mark { background: color-mix(in srgb, var(--danger) 75%, black); }
+.dd-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 600;
+  width: 52px;
+}
+.dd-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+}
+.dd-dont .dd-val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+
+/* ---------- Footer ---------- */
+.foot {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  font-size: 12px;
+  color: var(--ink-3);
+  display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  border-top: 1px solid var(--line-2);
+}
+.mono { font-family: var(--mono); font-size: 11px; }
+
+/* ---------- Tweaks ---------- */
+.tweaks-panel {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  font-size: 13px;
+  animation: popIn 0.22s var(--ease-out) both;
+}
+.tweaks-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line-2);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.tweaks-close {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink-3);
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.1s var(--ease-out);
+}
+.tweaks-close:active { transform: scale(0.9); }
+@media (hover: hover) and (pointer: fine) {
+  .tweaks-close:hover { background: var(--bg-2); color: var(--ink); }
+}
+.tweaks-body { padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+.tw-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.tw-row > span { color: var(--ink-2); }
+
+.swatches { display: flex; gap: 6px; }
+.swatch {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform 0.12s var(--ease-out), box-shadow 0.12s var(--ease-out);
+  box-shadow: 0 0 0 1px var(--line);
+}
+@media (hover: hover) and (pointer: fine) {
+  .swatch:hover { transform: scale(1.1); }
+}
+.swatch:active { transform: scale(0.9); }
+.swatch.on { border-color: var(--ink); transform: scale(1.05); box-shadow: 0 0 0 1px var(--line), 0 2px 6px rgba(0,0,0,.12); }
+
+.toggle {
+  position: relative;
+  width: 34px; height: 20px;
+  background: var(--line);
+  border-radius: 999px;
+  transition: background 0.2s var(--ease-out);
+}
+.toggle > span {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  transition: left 0.2s var(--ease-out);
+}
+.toggle.on { background: var(--ink); }
+.toggle.on > span { left: 16px; }
+
+.segmented { display: inline-flex; gap: 2px; background: var(--bg-2); padding: 2px; border-radius: 7px; }
+.seg {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--ink-2);
+  border-radius: 5px;
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out), box-shadow 0.12s var(--ease-out);
+}
+.seg.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+/* ---------- Focus ---------- */
+button:focus-visible, input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-2) 70%, transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.15s !important;
+  }
+  .float-layer { display: none; }
+}
+
+/* ---------- Hero entrance ---------- */
+.title-block {
+  animation: heroUp 1s var(--ease-out) both;
+  animation-delay: 0.06s;
+}
+.search-block {
+  animation: heroUp 1s var(--ease-out) both;
+  animation-delay: 0.28s;
+}
+@keyframes heroUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Hero dot grid ---------- */
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--ink) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 85%);
+  opacity: 0.18;
+}
+
+/* ---------- Hero orb ---------- */
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 1000px; height: 760px;
+  left: 50%; top: -220px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center,
+    color-mix(in srgb, var(--accent-2) 16%, transparent) 0%,
+    color-mix(in srgb, var(--accent-2) 4%, transparent) 45%,
+    transparent 68%);
+  pointer-events: none; z-index: 1;
+  animation: orbBreath 7s ease-in-out infinite;
+}
+@keyframes orbBreath {
+  0%,100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
+  50%     { opacity: 1;    transform: translateX(-50%) scale(1.1); }
+}
+
+/* ---------- Gradient text ---------- */
+.hero-title em {
+  background: linear-gradient(128deg, #2d9e6b 0%, var(--accent-2) 40%, #155e42 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+/* ---------- CTA arrow nudge ---------- */
+.cta svg {
+  transition: transform 0.22s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta:not(.cta-off):hover svg { transform: translateX(4px); }
+}
+
+/* ---------- CTA shimmer ---------- */
+.cta { position: relative; overflow: hidden; }
+.cta::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.13) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.65s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta:not(.cta-off):hover::after { transform: translateX(120%); }
+}
+
+/* ---------- Brand hover ---------- */
+.brand {
+  transition: opacity 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover { opacity: 0.7; transform: translateY(-1px); }
+}
+.brand:active { transform: scale(0.97); opacity: 0.85; }
+
+
+/* ---------- Card accent hover ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    border-color: color-mix(in srgb, var(--accent-2) 25%, var(--line));
+    box-shadow: 0 4px 20px rgba(0,0,0,.07), 0 0 0 1px color-mix(in srgb, var(--accent-2) 12%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 600px) {
+  .top-bar { padding: 14px 18px; }
+  .hero { padding: 20px 18px 60px; }
+  .search-row { flex-direction: column; }
+  .cta { width: 100%; justify-content: center; }
+  .hero-title { font-size: 34px; }
+  .results { padding: 20px 18px 60px; }
+  .card { padding: 20px; }
+  .ex-head, .ex-row { grid-template-columns: 50px 1fr 1fr; gap: 8px; font-size: 12px; }
+}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+// Currency formatting data for MoneyMoneyMoney
+// Sources: ISO 4217, CLDR, and the attached formatting guide
+
+window.COUNTRIES = [
+  // --- USD ---
+  { id: 'us', country: 'United States', flag: '🇺🇸', currencyName: 'US Dollar', currencyCode: 'USD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+
+  // --- GBP ---
+  { id: 'uk', country: 'United Kingdom', flag: '🇬🇧', currencyName: 'British Pound', currencyCode: 'GBP', currencySymbol: '£', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '£1,234.56', exampleDont: '1.234,56 £' },
+
+  // --- CAD ---
+  { id: 'ca-en', country: 'Canada (English)', flag: '🇨🇦', currencyName: 'Canadian Dollar', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1,234.56', exampleDont: '$1.234,56' },
+  { id: 'ca-fr', country: 'Canada (French)', flag: '🇨🇦', currencyName: 'Canadian Dollar', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 $', exampleDont: '$1,234.56' },
+
+  // --- Eurozone ---
+  { id: 'de', country: 'Germany', flag: '🇩🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
+  { id: 'fr', country: 'France', flag: '🇫🇷', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56' },
+  { id: 'es', country: 'Spain', flag: '🇪🇸', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
+  { id: 'it', country: 'Italy', flag: '🇮🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
+  { id: 'nl', country: 'Netherlands', flag: '🇳🇱', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1.234,56', exampleDont: '€1,234.56' },
+  { id: 'ie', country: 'Ireland', flag: '🇮🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1,234.56', exampleDont: '1.234,56 €' },
+  { id: 'pt', country: 'Portugal', flag: '🇵🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
+  { id: 'at', country: 'Austria', flag: '🇦🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56' },
+  { id: 'be-nl', country: 'Belgium (Dutch)', flag: '🇧🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56' },
+  { id: 'be-fr', country: 'Belgium (French)', flag: '🇧🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
+  { id: 'fi', country: 'Finland', flag: '🇫🇮', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56' },
+
+  // --- Switzerland ---
+  { id: 'ch-de', country: 'Switzerland (German)', flag: '🇨🇭', currencyName: 'Swiss Franc', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234.56", exampleDont: 'CHF 1,234.56' },
+  { id: 'ch-fr', country: 'Switzerland (French)', flag: '🇨🇭', currencyName: 'Swiss Franc', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234,56", exampleDont: 'CHF 1.234,56' },
+
+  // --- Nordics ---
+  { id: 'se', country: 'Sweden', flag: '🇸🇪', currencyName: 'Swedish Krona', currencyCode: 'SEK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56' },
+  { id: 'no', country: 'Norway', flag: '🇳🇴', currencyName: 'Norwegian Krone', currencyCode: 'NOK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56' },
+  { id: 'dk', country: 'Denmark', flag: '🇩🇰', currencyName: 'Danish Krone', currencyCode: 'DKK', currencySymbol: 'kr.', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 kr.', exampleDont: 'kr 1,234.56' },
+
+  // --- Central / Eastern Europe ---
+  { id: 'pl', country: 'Poland', flag: '🇵🇱', currencyName: 'Polish Złoty', currencyCode: 'PLN', currencySymbol: 'zł', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 zł', exampleDont: 'zł 1,234.56' },
+  { id: 'cz', country: 'Czech Republic', flag: '🇨🇿', currencyName: 'Czech Koruna', currencyCode: 'CZK', currencySymbol: 'Kč', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 Kč', exampleDont: 'Kč1,234.56' },
+  { id: 'ro', country: 'Romania', flag: '🇷🇴', currencyName: 'Romanian Leu', currencyCode: 'RON', currencySymbol: 'lei', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 lei', exampleDont: 'lei 1,234.56' },
+  { id: 'hu', country: 'Hungary', flag: '🇭🇺', currencyName: 'Hungarian Forint', currencyCode: 'HUF', currencySymbol: 'Ft', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 0, codePosition: 'after', exampleDo: '1 999 Ft', exampleDont: '1,999.00 Ft' },
+  { id: 'ua', country: 'Ukraine', flag: '🇺🇦', currencyName: 'Ukrainian Hryvnia', currencyCode: 'UAH', currencySymbol: '₴', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₴', exampleDont: '₴1,234.56' },
+  { id: 'tr', country: 'Turkey', flag: '🇹🇷', currencyName: 'Turkish Lira', currencyCode: 'TRY', currencySymbol: '₺', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 ₺', exampleDont: '₺1,234.56' },
+  { id: 'ru', country: 'Russia', flag: '🇷🇺', currencyName: 'Russian Ruble', currencyCode: 'RUB', currencySymbol: '₽', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₽', exampleDont: '₽1,234.56' },
+
+  // --- Asia ---
+  { id: 'jp', country: 'Japan', flag: '🇯🇵', currencyName: 'Japanese Yen', currencyCode: 'JPY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '¥1,234', exampleDont: '¥1,234.00' },
+  { id: 'cn', country: 'China', flag: '🇨🇳', currencyName: 'Chinese Yuan', currencyCode: 'CNY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '¥1,234.56', exampleDont: '1.234,56 ¥' },
+  { id: 'kr', country: 'South Korea', flag: '🇰🇷', currencyName: 'South Korean Won', currencyCode: 'KRW', currencySymbol: '₩', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '₩9,900', exampleDont: '₩9,900.00' },
+  { id: 'in', country: 'India', flag: '🇮🇳', currencyName: 'Indian Rupee', currencyCode: 'INR', currencySymbol: '₹', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₹1,23,456.78', exampleDont: '₹123,456.78', indianGrouping: true },
+  { id: 'id', country: 'Indonesia', flag: '🇮🇩', currencyName: 'Indonesian Rupiah', currencyCode: 'IDR', currencySymbol: 'Rp', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: 'Rp 1.234.567', exampleDont: 'Rp 1,234.56' },
+  { id: 'vn', country: 'Vietnam', flag: '🇻🇳', currencyName: 'Vietnamese Dong', currencyCode: 'VND', currencySymbol: '₫', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'after', exampleDo: '199.000 ₫', exampleDont: '₫199.00' },
+  { id: 'th', country: 'Thailand', flag: '🇹🇭', currencyName: 'Thai Baht', currencyCode: 'THB', currencySymbol: '฿', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '฿1,234.56', exampleDont: '1.234,56 ฿' },
+  { id: 'ph', country: 'Philippines', flag: '🇵🇭', currencyName: 'Philippine Peso', currencyCode: 'PHP', currencySymbol: '₱', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₱1,234.56', exampleDont: '1.234,56 ₱' },
+  { id: 'my', country: 'Malaysia', flag: '🇲🇾', currencyName: 'Malaysian Ringgit', currencyCode: 'MYR', currencySymbol: 'RM', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'RM1,234.56', exampleDont: 'RM 1.234,56' },
+  { id: 'sg', country: 'Singapore', flag: '🇸🇬', currencyName: 'Singapore Dollar', currencyCode: 'SGD', currencySymbol: 'S$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'S$1,234.56', exampleDont: '1.234,56 S$' },
+  { id: 'tw', country: 'Taiwan', flag: '🇹🇼', currencyName: 'New Taiwan Dollar', currencyCode: 'TWD', currencySymbol: 'NT$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: 'NT$1,234', exampleDont: 'NT$1,234.00' },
+  { id: 'hk', country: 'Hong Kong', flag: '🇭🇰', currencyName: 'Hong Kong Dollar', currencyCode: 'HKD', currencySymbol: 'HK$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'HK$1,234.56', exampleDont: '1.234,56 HK$' },
+
+  // --- Oceania ---
+  { id: 'au', country: 'Australia', flag: '🇦🇺', currencyName: 'Australian Dollar', currencyCode: 'AUD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+  { id: 'nz', country: 'New Zealand', flag: '🇳🇿', currencyName: 'New Zealand Dollar', currencyCode: 'NZD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+
+  // --- Latin America ---
+  { id: 'br', country: 'Brazil', flag: '🇧🇷', currencyName: 'Brazilian Real', currencyCode: 'BRL', currencySymbol: 'R$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R$ 1.234,56', exampleDont: 'R$1,234.56' },
+  { id: 'ar', country: 'Argentina', flag: '🇦🇷', currencyName: 'Argentine Peso', currencyCode: 'ARS', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1.234,56', exampleDont: '$1,234.56' },
+  { id: 'mx', country: 'Mexico', flag: '🇲🇽', currencyName: 'Mexican Peso', currencyCode: 'MXN', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+  { id: 'co', country: 'Colombia', flag: '🇨🇴', currencyName: 'Colombian Peso', currencyCode: 'COP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 1.234', exampleDont: '$1,234.00' },
+  { id: 'cl', country: 'Chile', flag: '🇨🇱', currencyName: 'Chilean Peso', currencyCode: 'CLP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 9.990', exampleDont: '$9,990.00' },
+
+  // --- Middle East / Africa ---
+  { id: 'sa', country: 'Saudi Arabia', flag: '🇸🇦', currencyName: 'Saudi Riyal', currencyCode: 'SAR', currencySymbol: '﷼', symbolPosition: 'after', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'after', exampleDo: '1,234.56 ﷼', exampleDont: '﷼1.234,56' },
+  { id: 'il', country: 'Israel', flag: '🇮🇱', currencyName: 'Israeli New Shekel', currencyCode: 'ILS', currencySymbol: '₪', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₪1,234.56', exampleDont: '1.234,56 ₪' },
+  { id: 'ae', country: 'United Arab Emirates', flag: '🇦🇪', currencyName: 'UAE Dirham', currencyCode: 'AED', currencySymbol: 'د.إ', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'AED 1,234.56', exampleDont: '1.234,56 AED' },
+  { id: 'eg', country: 'Egypt', flag: '🇪🇬', currencyName: 'Egyptian Pound', currencyCode: 'EGP', currencySymbol: 'ج.م', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'EGP 1,234.56', exampleDont: '1.234,56 EGP' },
+  { id: 'za', country: 'South Africa', flag: '🇿🇦', currencyName: 'South African Rand', currencyCode: 'ZAR', currencySymbol: 'R', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R 1 234.56', exampleDont: 'R1,234.56' },
+  { id: 'ng', country: 'Nigeria', flag: '🇳🇬', currencyName: 'Nigerian Naira', currencyCode: 'NGN', currencySymbol: '₦', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₦1,234.56', exampleDont: '1.234,56 ₦' },
+];
+
+window.GROUPS = {
+  currency: [
+    { id: 'eur', label: 'Euro', symbol: '€', ids: ['de','fr','es','it','nl','ie','pt','at','be-nl','be-fr','fi'] },
+    { id: 'usd', label: 'US Dollar', symbol: '$', ids: ['us'] },
+    { id: 'gbp', label: 'British Pound', symbol: '£', ids: ['uk'] },
+    { id: 'jpy', label: 'Japanese Yen', symbol: '¥', ids: ['jp'] },
+    { id: 'chf', label: 'Swiss Franc', symbol: 'CHF', ids: ['ch-de','ch-fr'] },
+    { id: 'sek', label: 'Swedish Krona', symbol: 'kr', ids: ['se'] },
+  ],
+  region: [
+    { id: 'g7', label: 'G7', ids: ['us','uk','de','fr','it','ca-en','jp'] },
+    { id: 'eurozone', label: 'EU / Eurozone', ids: ['de','fr','es','it','nl','ie','pt','at','be-nl','be-fr','fi'] },
+    { id: 'latam', label: 'Latin America', ids: ['br','ar','mx','co','cl'] },
+    { id: 'apac', label: 'Asia-Pacific', ids: ['jp','cn','kr','in','au','nz','id','vn','th','ph','my','sg','tw','hk'] },
+    { id: 'me', label: 'Middle East', ids: ['sa','il','ae','eg'] },
+    { id: 'nordic', label: 'Nordic', ids: ['se','no','dk','fi'] },
+    { id: 'en', label: 'English-speaking', ids: ['us','uk','au','nz','ca-en','ie','sg','za','ng','ph','hk'] },
+  ],
+};
+  </script>
+
+  <script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+// ---------- Tweakable defaults ----------
+const TWEAKS = {
+  "accentColor": "#1f8a5b",
+  "floatingSymbols": true,
+  "showDontExamples": true,
+  "chipStyle": "pill"
+};
+
+// ---------- Helpers ----------
+const COUNTRIES = window.COUNTRIES;
+const GROUPS = window.GROUPS;
+const COUNTRY_BY_ID = Object.fromEntries(COUNTRIES.map((c) => [c.id, c]));
+
+function formatNumber(n, country, forceDecimals) {
+  const { decimalSeparator: ds, thousandsSeparator: ts, decimalPlaces, indianGrouping } = country;
+  const places = forceDecimals !== undefined ? forceDecimals : decimalPlaces;
+  const fixed = n.toFixed(places);
+  let [intPart, decPart] = fixed.split('.');
+  let grouped;
+  if (indianGrouping) {
+    const last3 = intPart.slice(-3);
+    const rest = intPart.slice(0, -3);
+    grouped = rest ? rest.replace(/\B(?=(\d{2})+(?!\d))/g, ts) + ts + last3 : last3;
+  } else {
+    grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ts);
+  }
+  return decPart ? grouped + ds + decPart : grouped;
+}
+
+function formatWithSymbol(n, country) {
+  const num = formatNumber(n, country);
+  const sym = country.currencySymbol;
+  if (!sym) return num;
+  const space = country.symbolSpace ? '\u00A0' : '';
+  return country.symbolPosition === 'before' ? `${sym}${space}${num}` : `${num}${space}${sym}`;
+}
+
+function formatWithCode(n, country) {
+  const num = formatNumber(n, country);
+  const code = country.currencyCode;
+  const space = '\u00A0';
+  return country.codePosition === 'before' ? `${code}${space}${num}` : `${num}${space}${code}`;
+}
+
+// ---------- Floating currency symbols ----------
+function FloatingSymbols({ active }) {
+  const symbols = useMemo(() => {
+    return [
+    { sym: '€', x: 8, y: 22, size: 34, delay: 0 },
+    { sym: '$', x: 18, y: 58, size: 38, delay: 0.8 },
+    { sym: '£', x: 5, y: 78, size: 30, delay: 1.6 },
+    { sym: '¥', x: 24, y: 86, size: 28, delay: 2.4 },
+    { sym: '₹', x: 13, y: 40, size: 32, delay: 0.4 },
+    { sym: '₩', x: 80, y: 22, size: 34, delay: 1.2 },
+    { sym: '฿', x: 90, y: 52, size: 34, delay: 2.0 },
+    { sym: '₺', x: 82, y: 78, size: 30, delay: 0.6 },
+    { sym: '₫', x: 72, y: 90, size: 28, delay: 1.4 },
+    { sym: 'kr', x: 92, y: 34, size: 26, delay: 2.2 },
+    { sym: '฿', x: 3, y: 50, size: 30, delay: 1.8 },
+    { sym: '₪', x: 94, y: 68, size: 28, delay: 2.6 }];
+  }, []);
+
+  if (!active) return null;
+  return (
+    <div className="float-layer" aria-hidden="true">
+      {symbols.map((s, i) =>
+      <div
+        key={i}
+        className="float-sym"
+        style={{
+          left: `${s.x}%`,
+          top: `${s.y}%`,
+          fontSize: `${s.size * 4.5}px`,
+          '--delay': `${s.delay}s`
+        }}>
+          <span>{s.sym}</span>
+        </div>
+      )}
+    </div>);
+}
+
+// ---------- Combobox (multi-select) ----------
+function SearchCombobox({ selected, setSelected }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [activeIdx, setActiveIdx] = useState(0);
+  const wrapRef = useRef(null);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return COUNTRIES;
+    return COUNTRIES.filter((c) =>
+    c.country.toLowerCase().includes(q) ||
+    c.currencyCode.toLowerCase().includes(q) ||
+    c.currencyName.toLowerCase().includes(q)
+    );
+  }, [query]);
+
+  useEffect(() => {setActiveIdx(0);}, [query]);
+
+  useEffect(() => {
+    const onDoc = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, []);
+
+  const toggle = (id) => {
+    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  };
+  const remove = (id) => setSelected((prev) => prev.filter((x) => x !== id));
+
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {e.preventDefault();setOpen(true);setActiveIdx((i) => Math.min(i + 1, filtered.length - 1));} else
+    if (e.key === 'ArrowUp') {e.preventDefault();setActiveIdx((i) => Math.max(i - 1, 0));} else
+    if (e.key === 'Enter') {e.preventDefault();if (filtered[activeIdx]) toggle(filtered[activeIdx].id);} else
+    if (e.key === 'Escape') {setOpen(false);} else
+    if (e.key === 'Backspace' && !query && selected.length) {
+      remove(selected[selected.length - 1]);
+    }
+  };
+
+  useEffect(() => {
+    if (open && listRef.current) {
+      const el = listRef.current.querySelector(`[data-idx="${activeIdx}"]`);
+      if (el) el.scrollIntoViewIfNeeded ? el.scrollIntoViewIfNeeded({ block: 'nearest' }) : null;
+    }
+  }, [activeIdx, open]);
+
+  return (
+    <div className="combobox" ref={wrapRef}>
+      <div
+        className={`combo-input ${open ? 'open' : ''}`}
+        onClick={() => {setOpen(true);inputRef.current?.focus();}}>
+
+        <svg className="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+        </svg>
+        <div className="chips-input">
+          {selected.map((id) => {
+            const c = COUNTRY_BY_ID[id];
+            if (!c) return null;
+            return (
+              <span className="token" key={id}>
+                <span className="token-flag">{c.flag}</span>
+                <span className="token-label">{c.country}</span>
+                <button className="token-x" onClick={(e) => {e.stopPropagation();remove(id);}} aria-label={`Remove ${c.country}`}>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                  </svg>
+                </button>
+              </span>);
+          })}
+          <input
+            ref={inputRef}
+            className="combo-native"
+            placeholder={selected.length ? '' : 'Search countries or currencies…'}
+            value={query}
+            onChange={(e) => {setQuery(e.target.value);setOpen(true);}}
+            onFocus={() => setOpen(true)}
+            onKeyDown={onKeyDown} />
+        </div>
+        {selected.length > 0 &&
+        <button className="clear-inline" onClick={(e) => {e.stopPropagation();setSelected([]);setQuery('');}} title="Clear">
+            clear
+          </button>
+        }
+      </div>
+
+      {open &&
+      <div className="combo-pop" ref={listRef}>
+          {filtered.length === 0 ?
+        <div className="combo-empty">No match for "{query}"</div> :
+        filtered.map((c, i) => {
+          const active = selected.includes(c.id);
+          return (
+            <button
+              key={c.id}
+              data-idx={i}
+              className={`combo-item ${i === activeIdx ? 'hover' : ''} ${active ? 'active' : ''}`}
+              style={query ? { animation: 'none' } : undefined}
+              onMouseEnter={() => setActiveIdx(i)}
+              onClick={() => toggle(c.id)}>
+                  <span className="ci-flag">{c.flag}</span>
+                  <span className="ci-name">{c.country}</span>
+                  <span className="ci-dot">·</span>
+                  <span className="ci-code">{c.currencyCode}</span>
+                  <span className="ci-check" aria-hidden>
+                    {active &&
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m5 12 5 5L20 7" />
+                      </svg>
+                }
+                  </span>
+                </button>);
+        })
+        }
+        </div>
+      }
+    </div>);
+}
+
+// ---------- Chip rows ----------
+function ChipRow({ label, groups, selected, setSelected }) {
+  const isActive = (g) => g.ids.every((id) => selected.includes(id)) && g.ids.length > 0;
+  const toggleGroup = (g) => {
+    if (isActive(g)) {
+      setSelected((prev) => prev.filter((id) => !g.ids.includes(id)));
+    } else {
+      setSelected((prev) => Array.from(new Set([...prev, ...g.ids])));
+    }
+  };
+  return (
+    <div className="chip-row" style={{ textAlign: "center", flexDirection: "column", gap: "8px", margin: "0px 0px 16px", justifyContent: "center", alignItems: "center" }}>
+      <div className="chip-row-label">{label}</div>
+      <div className="chip-row-chips" style={{ justifyContent: "center" }}>
+        {groups.map((g) =>
+        <button
+          key={g.id}
+          className={`chip ${isActive(g) ? 'chip-on' : ''}`}
+          onClick={() => toggleGroup(g)}>
+            {g.symbol && <span className="chip-sym">{g.symbol}</span>}
+            <span>{g.label}</span>
+          </button>
+        )}
+      </div>
+    </div>);
+}
+
+// ---------- Card ----------
+function CurrencyCard({ country, onRemove }) {
+  const c = country;
+  const [exiting, setExiting] = React.useState(false);
+  const handleRemove = () => {
+    setExiting(true);
+    setTimeout(onRemove, 260);
+  };
+  const prices = [9.99, 149, 1234.56];
+  const labels = ['Small', 'Medium', 'Large'];
+
+  const specs = [
+  { k: 'Symbol position', v: `${c.symbolPosition}${c.symbolSpace ? ' · with space' : ' · no space'}` },
+  { k: 'Decimal separator', v: c.decimalSeparator === '.' ? 'dot  .' : 'comma  ,' },
+  { k: 'Thousands separator',
+    v: c.thousandsSeparator === ',' ? 'comma  ,' :
+    c.thousandsSeparator === '.' ? 'dot  .' :
+    c.thousandsSeparator === ' ' ? 'space  ␣' :
+    "apostrophe  '" },
+  { k: 'Decimal places', v: c.decimalPlaces === 0 ? '0 (no fraction)' : '2' }];
+
+  return (
+    <article className={`card ${exiting ? 'card-exit' : ''}`}>
+      <button className="card-close" onClick={handleRemove} aria-label={`Remove ${c.country}`}>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+      <header className="card-head">
+        <div className="card-flag">{c.flag}</div>
+        <div className="card-head-text">
+          <h3>{c.country}</h3>
+          <div className="card-cur">
+            <span>{c.currencyName}</span>
+            <span className="card-code">{c.currencyCode}</span>
+            {c.currencySymbol && <span className="card-sym">{c.currencySymbol}</span>}
+          </div>
+        </div>
+      </header>
+
+      <div className="specs">
+        {specs.map((s) =>
+        <div className="spec" key={s.k}>
+            <span className="spec-k">{s.k}</span>
+            <span className="spec-v">{s.v}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="examples">
+        <div className="ex-head">
+          <span>Example</span>
+          <span>Local (symbol)</span>
+          <span>International (code)</span>
+        </div>
+        {prices.map((p, i) =>
+        <div className="ex-row" key={i}>
+            <span className="ex-label">{labels[i]}</span>
+            <span className="ex-mono">{formatWithSymbol(p, c)}</span>
+            <span className="ex-mono ex-mono-dim">{formatWithCode(p, c)}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="dodont">
+        <div className="dd dd-do">
+          <span className="dd-mark" aria-hidden>✓</span>
+          <span className="dd-label">Correct</span>
+          <span className="dd-val">{c.exampleDo}</span>
+        </div>
+        {window.__tweaks.showDontExamples &&
+        <div className="dd dd-dont">
+            <span className="dd-mark" aria-hidden>✗</span>
+            <span className="dd-label">Avoid</span>
+            <span className="dd-val">{c.exampleDont}</span>
+          </div>
+        }
+      </div>
+    </article>);
+}
+
+// ---------- Results ----------
+function Results({ selected, onEdit, setSelected }) {
+  const countries = selected.map((id) => COUNTRY_BY_ID[id]).filter(Boolean);
+
+  return (
+    <section className="results">
+      <div className="edit-bar">
+        <div className="edit-meta">
+          <strong>{countries.length}</strong>&nbsp;{countries.length === 1 ? 'country' : 'countries'}
+        </div>
+        <button className="clear-results-btn" onClick={() => setSelected([])}>Clear all</button>
+      </div>
+
+      <div className="cards-grid">
+        {countries.map((c) => <CurrencyCard key={c.id} country={c} onRemove={() => setSelected(prev => prev.filter(id => id !== c.id))} />)}
+      </div>
+    </section>);
+}
+
+// ---------- Tweaks Panel ----------
+function TweaksPanel({ tweaks, setTweak, visible, onClose }) {
+  if (!visible) return null;
+  return (
+    <div className="tweaks-panel">
+      <div className="tweaks-head">
+        <span>Tweaks</span>
+        <button onClick={onClose} className="tweaks-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <div className="tweaks-body">
+        <label className="tw-row">
+          <span>Accent color</span>
+          <div className="swatches">
+            {['#1f8a5b', '#0b0b0b', '#2d5bff', '#c2410c', '#7c3aed'].map((col) =>
+            <button
+              key={col}
+              className={`swatch ${tweaks.accentColor === col ? 'on' : ''}`}
+              style={{ background: col }}
+              onClick={() => setTweak('accentColor', col)}
+              aria-label={col} />
+            )}
+          </div>
+        </label>
+        <label className="tw-row">
+          <span>Floating symbols</span>
+          <button
+            className={`toggle ${tweaks.floatingSymbols ? 'on' : ''}`}
+            onClick={() => setTweak('floatingSymbols', !tweaks.floatingSymbols)}
+            role="switch" aria-checked={tweaks.floatingSymbols}>
+            <span /></button>
+        </label>
+        <label className="tw-row">
+          <span>Show "Avoid" examples</span>
+          <button
+            className={`toggle ${tweaks.showDontExamples ? 'on' : ''}`}
+            onClick={() => setTweak('showDontExamples', !tweaks.showDontExamples)}
+            role="switch" aria-checked={tweaks.showDontExamples}>
+            <span /></button>
+        </label>
+        <label className="tw-row">
+          <span>Chip style</span>
+          <div className="segmented">
+            {['pill', 'square'].map((s) =>
+            <button key={s} className={tweaks.chipStyle === s ? 'seg on' : 'seg'} onClick={() => setTweak('chipStyle', s)}>{s}</button>
+            )}
+          </div>
+        </label>
+      </div>
+    </div>);
+}
+
+// ---------- App ----------
+function App() {
+  const [selected, setSelected] = useState(() => {
+    try {return JSON.parse(localStorage.getItem('mmm.selected') || '[]');} catch {return [];}
+  });
+  const [view, setView] = useState(() => localStorage.getItem('mmm.view') || 'landing');
+  const [tweaks, setTweaks] = useState(TWEAKS);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+
+  window.__tweaks = tweaks;
+
+  useEffect(() => {localStorage.setItem('mmm.selected', JSON.stringify(selected));}, [selected]);
+  useEffect(() => {localStorage.setItem('mmm.view', view);}, [view]);
+
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const setTweak = (k, v) => {
+    setTweaks((prev) => {
+      const next = { ...prev, [k]: v };
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent', tweaks.accentColor);
+  }, [tweaks.accentColor]);
+
+  const showResults = () => {
+    if (!selected.length) return;
+    setView('results');
+    setTimeout(() => {
+      document.querySelector('.results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 40);
+  };
+
+  const showLanding = () => {
+    setSelected([]);
+    setView('landing');
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 40);
+  };
+
+  return (
+    <div className={`app chip-${tweaks.chipStyle}`} data-screen-label={view === 'landing' ? '01 Search' : '02 Results'}>
+      <FloatingSymbols active={view === 'landing' && tweaks.floatingSymbols} />
+
+      <header className="top-bar" style={{ justifyContent: "center" }}>
+        <div className="brand" onClick={showLanding} style={{ cursor: 'pointer' }}>
+          <span className="brand-logo" aria-hidden>💸💸💸</span>
+          <span className="brand-name">MoneyMoneyMoney</span>
+        </div>
+        <nav className="top-nav">
+        </nav>
+      </header>
+
+      <main className={`hero ${view === 'results' ? 'compact' : ''}`}>
+        <div className="hero-inner">
+          <div className="title-block">
+            <h1 className="hero-title">
+              Format prices correctly,<br />
+              <em>for every market.</em>
+            </h1>
+            <p className="hero-sub">
+              A reference for designers, PMs &amp; engineers who ship pricing across locales.
+              Pick countries — get symbols, separators, do's and don'ts.
+            </p>
+          </div>
+
+          <div className="search-block" style={{ justifyContent: "center" }}>
+            <div className="search-row">
+              <SearchCombobox selected={selected} setSelected={setSelected} />
+              <button
+                className={`cta ${selected.length ? '' : 'cta-off'}`}
+                disabled={!selected.length}
+                onClick={showResults}>
+                <span>Show formatting</span>
+                {selected.length > 0 && <span className="cta-badge">{selected.length}</span>}
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </button>
+            </div>
+
+            <div className="chips-block">
+              <ChipRow label="By currency" groups={GROUPS.currency} selected={selected} setSelected={setSelected} />
+              <ChipRow label="By region" groups={GROUPS.region} selected={selected} setSelected={setSelected} />
+              {selected.length > 0 &&
+              <div className="clear-row">
+                  <button className="ghost-btn" onClick={() => setSelected([])}>Clear all</button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {view === 'results' && <Results selected={selected} onEdit={showLanding} setSelected={setSelected} />}
+
+      <footer className="foot">
+        <div>Data based on <span className="mono">ISO 4217</span>, <span className="mono">CLDR</span>, and locale conventions.</div>
+        <div>Built for anyone who works with pricing across markets.</div>
+      </footer>
+
+      <TweaksPanel tweaks={tweaks} setTweak={setTweak} visible={tweaksOpen} onClose={() => setTweaksOpen(false)} />
+    </div>);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
