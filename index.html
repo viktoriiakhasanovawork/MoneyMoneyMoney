@@ -1001,7 +1001,12 @@ function SearchCombobox({ selected, setSelected }) {
   }, []);
 
   const toggle = (id) => {
-    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    setSelected((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      setOpen(false);
+      setQuery('');
+      return [...prev, id];
+    });
   };
   const remove = (id) => setSelected((prev) => prev.filter((x) => x !== id));
 
@@ -1130,7 +1135,7 @@ function CurrencyCard({ country, onRemove }) {
     setExiting(true);
     setTimeout(onRemove, 260);
   };
-  const prices = [9.99, 149, 1234.56];
+  const prices = [9.99, 1234.56, 123456.78];
   const labels = ['Small', 'Medium', 'Large'];
 
   const specs = [
