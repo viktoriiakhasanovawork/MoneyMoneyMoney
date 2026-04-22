@@ -848,6 +848,214 @@ button:focus-visible, input:focus-visible {
   /* Float symbols — fewer visible on small screens */
   .float-layer { opacity: 0.6; }
 }
+
+/* Card clickable hint */
+.card-clickable::after {
+  content: '↗';
+  position: absolute; bottom: 14px; right: 46px;
+  font-size: 13px; color: var(--ink-4);
+  transition: color 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-clickable:hover::after { color: var(--accent-2); transform: translate(2px, -2px); }
+}
+
+/* ---------- Detail view ---------- */
+.detail-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: var(--bg);
+  overflow-y: auto;
+  animation: detailIn 0.35s var(--ease-out) both;
+}
+@keyframes detailIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.detail-overlay.detail-exit {
+  animation: detailOut 0.25s var(--ease-in-out) both !important;
+}
+@keyframes detailOut {
+  to { opacity: 0; transform: translateX(40px); }
+}
+
+.detail-topbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 32px;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.detail-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 500; color: var(--ink-2);
+  padding: 7px 12px 7px 8px;
+  border-radius: 8px;
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .detail-back:hover { background: var(--bg-2); color: var(--ink); }
+}
+.detail-back:active { transform: scale(0.97); }
+
+.detail-body {
+  max-width: 780px; margin: 0 auto;
+  padding: 40px 32px 80px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+
+.detail-hero {
+  display: flex; align-items: center; gap: 20px;
+}
+.detail-flag {
+  width: 72px; height: 72px; font-size: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent-2) 8%, white) 0%, var(--bg-2) 100%);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 12%, var(--line));
+  border-radius: 22.37%;
+  flex-shrink: 0;
+}
+.detail-hero-text h1 {
+  font-size: 26px; font-weight: 700; letter-spacing: -0.03em;
+  margin: 0 0 6px;
+}
+.detail-native {
+  font-size: 15px; color: var(--ink-3);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
+.detail-native-name {
+  font-size: 17px; color: var(--ink-2); font-weight: 500;
+}
+.detail-rtl-badge {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 3px 8px; border-radius: 999px;
+  background: color-mix(in srgb, #6366f1 10%, white);
+  color: #6366f1;
+}
+
+.detail-section-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600; color: var(--ink-3);
+  margin: 0 0 14px;
+}
+
+/* Paywall mockup */
+.paywall-wrap {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.paywall-devices {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.paywall-phone {
+  flex: 1; min-width: 220px; max-width: 280px;
+  background: #0f0f13;
+  border-radius: 28px;
+  padding: 28px 20px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 24px 56px rgba(0,0,0,.22), 0 4px 12px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+}
+.paywall-phone::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 90px; height: 26px;
+  background: #0f0f13;
+  border-radius: 0 0 16px 16px;
+  z-index: 2;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.pw-app-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #1f8a5b, #155e42);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 4px 12px rgba(31,138,91,0.4);
+  margin: 0 auto;
+}
+.pw-title {
+  text-align: center;
+  color: #fff;
+  font-size: 18px; font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.pw-subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.45);
+  font-size: 12px; line-height: 1.5;
+}
+.pw-plans {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pw-plan {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: border-color 0.15s;
+}
+.pw-plan.pw-plan-featured {
+  background: rgba(31,138,91,0.18);
+  border-color: rgba(31,138,91,0.5);
+}
+.pw-plan-label {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.pw-plan-price {
+  font-size: 15px; font-weight: 700; color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.pw-plan-note {
+  font-size: 10px; color: rgba(255,255,255,0.35);
+}
+.pw-cta {
+  background: #1f8a5b;
+  color: #fff;
+  border-radius: 12px;
+  padding: 13px;
+  text-align: center;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 14px rgba(31,138,91,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.pw-fine-print {
+  text-align: center;
+  color: rgba(255,255,255,0.25);
+  font-size: 9.5px;
+}
+
+/* Full specs in detail */
+.detail-specs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--line);
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--line);
+}
+.detail-spec {
+  background: var(--bg-2);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.detail-spec-k {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-3); font-weight: 600;
+}
+.detail-spec-v {
+  font-size: 14px; color: var(--ink); font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .detail-topbar { padding: 12px 16px; }
+  .detail-body { padding: 24px 16px 60px; gap: 28px; }
+  .detail-hero { gap: 14px; }
+  .detail-flag { width: 56px; height: 56px; font-size: 30px; }
+  .detail-hero-text h1 { font-size: 20px; }
+  .paywall-phone { min-width: 0; }
+}
   </style>
 </head>
 <body>
@@ -859,78 +1067,78 @@ button:focus-visible, input:focus-visible {
 
 window.COUNTRIES = [
   // --- USD ---
-  { id: 'us', country: 'United States', flag: '🇺🇸', currencyName: 'US Dollar', currencyCode: 'USD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+  { id: 'us', country: 'United States', flag: '🇺🇸', currencyName: 'US Dollar', nativeName: 'US Dollar', currencyCode: 'USD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $', rtl: false, subunit: 'cent', subunitRatio: 100 },
 
   // --- GBP ---
-  { id: 'uk', country: 'United Kingdom', flag: '🇬🇧', currencyName: 'British Pound', currencyCode: 'GBP', currencySymbol: '£', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '£1,234.56', exampleDont: '1.234,56 £' },
+  { id: 'uk', country: 'United Kingdom', flag: '🇬🇧', currencyName: 'British Pound', nativeName: 'Pound Sterling', currencyCode: 'GBP', currencySymbol: '£', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '£1,234.56', exampleDont: '1.234,56 £', rtl: false, subunit: 'penny', subunitRatio: 100 },
 
   // --- CAD ---
-  { id: 'ca-en', country: 'Canada (English)', flag: '🇨🇦', currencyName: 'Canadian Dollar', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1,234.56', exampleDont: '$1.234,56' },
-  { id: 'ca-fr', country: 'Canada (French)', flag: '🇨🇦', currencyName: 'Canadian Dollar', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 $', exampleDont: '$1,234.56' },
+  { id: 'ca-en', country: 'Canada (English)', flag: '🇨🇦', currencyName: 'Canadian Dollar', nativeName: 'Canadian Dollar', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1,234.56', exampleDont: '$1.234,56', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'ca-fr', country: 'Canada (French)', flag: '🇨🇦', currencyName: 'Canadian Dollar', nativeName: 'Dollar canadien', currencyCode: 'CAD', currencySymbol: '$', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 $', exampleDont: '$1,234.56', rtl: false, subunit: 'cent', subunitRatio: 100 },
 
   // --- Eurozone ---
-  { id: 'de', country: 'Germany', flag: '🇩🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
-  { id: 'fr', country: 'France', flag: '🇫🇷', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56' },
-  { id: 'es', country: 'Spain', flag: '🇪🇸', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
-  { id: 'it', country: 'Italy', flag: '🇮🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
-  { id: 'nl', country: 'Netherlands', flag: '🇳🇱', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1.234,56', exampleDont: '€1,234.56' },
-  { id: 'ie', country: 'Ireland', flag: '🇮🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1,234.56', exampleDont: '1.234,56 €' },
-  { id: 'pt', country: 'Portugal', flag: '🇵🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
-  { id: 'at', country: 'Austria', flag: '🇦🇹', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56' },
-  { id: 'be-nl', country: 'Belgium (Dutch)', flag: '🇧🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56' },
-  { id: 'be-fr', country: 'Belgium (French)', flag: '🇧🇪', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56' },
-  { id: 'fi', country: 'Finland', flag: '🇫🇮', currencyName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56' },
+  { id: 'de', country: 'Germany', flag: '🇩🇪', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'Cent', subunitRatio: 100 },
+  { id: 'fr', country: 'France', flag: '🇫🇷', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'centime', subunitRatio: 100 },
+  { id: 'es', country: 'Spain', flag: '🇪🇸', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'céntimo', subunitRatio: 100 },
+  { id: 'it', country: 'Italy', flag: '🇮🇹', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'centesimo', subunitRatio: 100 },
+  { id: 'nl', country: 'Netherlands', flag: '🇳🇱', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1.234,56', exampleDont: '€1,234.56', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'ie', country: 'Ireland', flag: '🇮🇪', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '€1,234.56', exampleDont: '1.234,56 €', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'pt', country: 'Portugal', flag: '🇵🇹', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'cêntimo', subunitRatio: 100 },
+  { id: 'at', country: 'Austria', flag: '🇦🇹', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56', rtl: false, subunit: 'Cent', subunitRatio: 100 },
+  { id: 'be-nl', country: 'Belgium (Dutch)', flag: '🇧🇪', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '€ 1.234,56', exampleDont: '€1,234.56', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'be-fr', country: 'Belgium (French)', flag: '🇧🇪', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'centime', subunitRatio: 100 },
+  { id: 'fi', country: 'Finland', flag: '🇫🇮', currencyName: 'Euro', nativeName: 'Euro', currencyCode: 'EUR', currencySymbol: '€', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 €', exampleDont: '€1,234.56', rtl: false, subunit: 'sentti', subunitRatio: 100 },
 
   // --- Switzerland ---
-  { id: 'ch-de', country: 'Switzerland (German)', flag: '🇨🇭', currencyName: 'Swiss Franc', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234.56", exampleDont: 'CHF 1,234.56' },
-  { id: 'ch-fr', country: 'Switzerland (French)', flag: '🇨🇭', currencyName: 'Swiss Franc', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234,56", exampleDont: 'CHF 1.234,56' },
+  { id: 'ch-de', country: 'Switzerland (German)', flag: '🇨🇭', currencyName: 'Swiss Franc', nativeName: 'Schweizer Franken', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234.56", exampleDont: 'CHF 1,234.56', rtl: false, subunit: 'Rappen', subunitRatio: 100 },
+  { id: 'ch-fr', country: 'Switzerland (French)', flag: '🇨🇭', currencyName: 'Swiss Franc', nativeName: 'Franc suisse', currencyCode: 'CHF', currencySymbol: 'CHF', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: "'", decimalPlaces: 2, codePosition: 'before', exampleDo: "CHF 1'234,56", exampleDont: 'CHF 1.234,56', rtl: false, subunit: 'centime', subunitRatio: 100 },
 
   // --- Nordics ---
-  { id: 'se', country: 'Sweden', flag: '🇸🇪', currencyName: 'Swedish Krona', currencyCode: 'SEK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56' },
-  { id: 'no', country: 'Norway', flag: '🇳🇴', currencyName: 'Norwegian Krone', currencyCode: 'NOK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56' },
-  { id: 'dk', country: 'Denmark', flag: '🇩🇰', currencyName: 'Danish Krone', currencyCode: 'DKK', currencySymbol: 'kr.', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 kr.', exampleDont: 'kr 1,234.56' },
+  { id: 'se', country: 'Sweden', flag: '🇸🇪', currencyName: 'Swedish Krona', nativeName: 'Svensk krona', currencyCode: 'SEK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56', rtl: false, subunit: 'öre', subunitRatio: 100 },
+  { id: 'no', country: 'Norway', flag: '🇳🇴', currencyName: 'Norwegian Krone', nativeName: 'Norsk krone', currencyCode: 'NOK', currencySymbol: 'kr', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 kr', exampleDont: 'kr 1,234.56', rtl: false, subunit: 'øre', subunitRatio: 100 },
+  { id: 'dk', country: 'Denmark', flag: '🇩🇰', currencyName: 'Danish Krone', nativeName: 'Dansk krone', currencyCode: 'DKK', currencySymbol: 'kr.', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 kr.', exampleDont: 'kr 1,234.56', rtl: false, subunit: 'øre', subunitRatio: 100 },
 
   // --- Central / Eastern Europe ---
-  { id: 'pl', country: 'Poland', flag: '🇵🇱', currencyName: 'Polish Złoty', currencyCode: 'PLN', currencySymbol: 'zł', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 zł', exampleDont: 'zł 1,234.56' },
-  { id: 'cz', country: 'Czech Republic', flag: '🇨🇿', currencyName: 'Czech Koruna', currencyCode: 'CZK', currencySymbol: 'Kč', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 Kč', exampleDont: 'Kč1,234.56' },
-  { id: 'ro', country: 'Romania', flag: '🇷🇴', currencyName: 'Romanian Leu', currencyCode: 'RON', currencySymbol: 'lei', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 lei', exampleDont: 'lei 1,234.56' },
-  { id: 'hu', country: 'Hungary', flag: '🇭🇺', currencyName: 'Hungarian Forint', currencyCode: 'HUF', currencySymbol: 'Ft', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 0, codePosition: 'after', exampleDo: '1 999 Ft', exampleDont: '1,999.00 Ft' },
-  { id: 'ua', country: 'Ukraine', flag: '🇺🇦', currencyName: 'Ukrainian Hryvnia', currencyCode: 'UAH', currencySymbol: '₴', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₴', exampleDont: '₴1,234.56' },
-  { id: 'tr', country: 'Turkey', flag: '🇹🇷', currencyName: 'Turkish Lira', currencyCode: 'TRY', currencySymbol: '₺', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 ₺', exampleDont: '₺1,234.56' },
-  { id: 'ru', country: 'Russia', flag: '🇷🇺', currencyName: 'Russian Ruble', currencyCode: 'RUB', currencySymbol: '₽', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₽', exampleDont: '₽1,234.56' },
+  { id: 'pl', country: 'Poland', flag: '🇵🇱', currencyName: 'Polish Złoty', nativeName: 'Złoty polski', currencyCode: 'PLN', currencySymbol: 'zł', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 zł', exampleDont: 'zł 1,234.56', rtl: false, subunit: 'grosz', subunitRatio: 100 },
+  { id: 'cz', country: 'Czech Republic', flag: '🇨🇿', currencyName: 'Czech Koruna', nativeName: 'Česká koruna', currencyCode: 'CZK', currencySymbol: 'Kč', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 Kč', exampleDont: 'Kč1,234.56', rtl: false, subunit: 'haléř', subunitRatio: 100 },
+  { id: 'ro', country: 'Romania', flag: '🇷🇴', currencyName: 'Romanian Leu', nativeName: 'Leu românesc', currencyCode: 'RON', currencySymbol: 'lei', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 lei', exampleDont: 'lei 1,234.56', rtl: false, subunit: 'ban', subunitRatio: 100 },
+  { id: 'hu', country: 'Hungary', flag: '🇭🇺', currencyName: 'Hungarian Forint', nativeName: 'Magyar forint', currencyCode: 'HUF', currencySymbol: 'Ft', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 0, codePosition: 'after', exampleDo: '1 999 Ft', exampleDont: '1,999.00 Ft', rtl: false, subunit: 'fillér', subunitRatio: 100 },
+  { id: 'ua', country: 'Ukraine', flag: '🇺🇦', currencyName: 'Ukrainian Hryvnia', nativeName: 'Українська гривня', currencyCode: 'UAH', currencySymbol: '₴', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₴', exampleDont: '₴1,234.56', rtl: false, subunit: 'копійка', subunitRatio: 100 },
+  { id: 'tr', country: 'Turkey', flag: '🇹🇷', currencyName: 'Turkish Lira', nativeName: 'Türk lirası', currencyCode: 'TRY', currencySymbol: '₺', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'after', exampleDo: '1.234,56 ₺', exampleDont: '₺1,234.56', rtl: false, subunit: 'kuruş', subunitRatio: 100 },
+  { id: 'ru', country: 'Russia', flag: '🇷🇺', currencyName: 'Russian Ruble', nativeName: 'Российский рубль', currencyCode: 'RUB', currencySymbol: '₽', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'after', exampleDo: '1 234,56 ₽', exampleDont: '₽1,234.56', rtl: false, subunit: 'копейка', subunitRatio: 100 },
 
   // --- Asia ---
-  { id: 'jp', country: 'Japan', flag: '🇯🇵', currencyName: 'Japanese Yen', currencyCode: 'JPY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '¥1,234', exampleDont: '¥1,234.00' },
-  { id: 'cn', country: 'China', flag: '🇨🇳', currencyName: 'Chinese Yuan', currencyCode: 'CNY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '¥1,234.56', exampleDont: '1.234,56 ¥' },
-  { id: 'kr', country: 'South Korea', flag: '🇰🇷', currencyName: 'South Korean Won', currencyCode: 'KRW', currencySymbol: '₩', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '₩9,900', exampleDont: '₩9,900.00' },
-  { id: 'in', country: 'India', flag: '🇮🇳', currencyName: 'Indian Rupee', currencyCode: 'INR', currencySymbol: '₹', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₹1,23,456.78', exampleDont: '₹123,456.78', indianGrouping: true },
-  { id: 'id', country: 'Indonesia', flag: '🇮🇩', currencyName: 'Indonesian Rupiah', currencyCode: 'IDR', currencySymbol: 'Rp', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: 'Rp 1.234.567', exampleDont: 'Rp 1,234.56' },
-  { id: 'vn', country: 'Vietnam', flag: '🇻🇳', currencyName: 'Vietnamese Dong', currencyCode: 'VND', currencySymbol: '₫', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'after', exampleDo: '199.000 ₫', exampleDont: '₫199.00' },
-  { id: 'th', country: 'Thailand', flag: '🇹🇭', currencyName: 'Thai Baht', currencyCode: 'THB', currencySymbol: '฿', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '฿1,234.56', exampleDont: '1.234,56 ฿' },
-  { id: 'ph', country: 'Philippines', flag: '🇵🇭', currencyName: 'Philippine Peso', currencyCode: 'PHP', currencySymbol: '₱', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₱1,234.56', exampleDont: '1.234,56 ₱' },
-  { id: 'my', country: 'Malaysia', flag: '🇲🇾', currencyName: 'Malaysian Ringgit', currencyCode: 'MYR', currencySymbol: 'RM', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'RM1,234.56', exampleDont: 'RM 1.234,56' },
-  { id: 'sg', country: 'Singapore', flag: '🇸🇬', currencyName: 'Singapore Dollar', currencyCode: 'SGD', currencySymbol: 'S$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'S$1,234.56', exampleDont: '1.234,56 S$' },
-  { id: 'tw', country: 'Taiwan', flag: '🇹🇼', currencyName: 'New Taiwan Dollar', currencyCode: 'TWD', currencySymbol: 'NT$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: 'NT$1,234', exampleDont: 'NT$1,234.00' },
-  { id: 'hk', country: 'Hong Kong', flag: '🇭🇰', currencyName: 'Hong Kong Dollar', currencyCode: 'HKD', currencySymbol: 'HK$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'HK$1,234.56', exampleDont: '1.234,56 HK$' },
+  { id: 'jp', country: 'Japan', flag: '🇯🇵', currencyName: 'Japanese Yen', nativeName: '円 (En)', currencyCode: 'JPY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '¥1,234', exampleDont: '¥1,234.00', rtl: false, subunit: 'sen (not used)', subunitRatio: 100 },
+  { id: 'cn', country: 'China', flag: '🇨🇳', currencyName: 'Chinese Yuan', nativeName: '人民币 (Rénmínbì)', currencyCode: 'CNY', currencySymbol: '¥', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '¥1,234.56', exampleDont: '1.234,56 ¥', rtl: false, subunit: '分 (fēn)', subunitRatio: 100 },
+  { id: 'kr', country: 'South Korea', flag: '🇰🇷', currencyName: 'South Korean Won', nativeName: '대한민국 원 (Won)', currencyCode: 'KRW', currencySymbol: '₩', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: '₩9,900', exampleDont: '₩9,900.00', rtl: false, subunit: 'jeon (not used)', subunitRatio: 100 },
+  { id: 'in', country: 'India', flag: '🇮🇳', currencyName: 'Indian Rupee', nativeName: 'भारतीय रुपया', currencyCode: 'INR', currencySymbol: '₹', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₹1,23,456.78', exampleDont: '₹123,456.78', indianGrouping: true, rtl: false, subunit: 'paisa', subunitRatio: 100 },
+  { id: 'id', country: 'Indonesia', flag: '🇮🇩', currencyName: 'Indonesian Rupiah', nativeName: 'Rupiah Indonesia', currencyCode: 'IDR', currencySymbol: 'Rp', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: 'Rp 1.234.567', exampleDont: 'Rp 1,234.56', rtl: false, subunit: 'sen (not used)', subunitRatio: 100 },
+  { id: 'vn', country: 'Vietnam', flag: '🇻🇳', currencyName: 'Vietnamese Dong', nativeName: 'Đồng Việt Nam', currencyCode: 'VND', currencySymbol: '₫', symbolPosition: 'after', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'after', exampleDo: '199.000 ₫', exampleDont: '₫199.00', rtl: false, subunit: 'hào (not used)', subunitRatio: 10 },
+  { id: 'th', country: 'Thailand', flag: '🇹🇭', currencyName: 'Thai Baht', nativeName: 'บาทไทย (Baht)', currencyCode: 'THB', currencySymbol: '฿', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '฿1,234.56', exampleDont: '1.234,56 ฿', rtl: false, subunit: 'สตางค์ (satang)', subunitRatio: 100 },
+  { id: 'ph', country: 'Philippines', flag: '🇵🇭', currencyName: 'Philippine Peso', nativeName: 'Piso ng Pilipinas', currencyCode: 'PHP', currencySymbol: '₱', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₱1,234.56', exampleDont: '1.234,56 ₱', rtl: false, subunit: 'sentimo', subunitRatio: 100 },
+  { id: 'my', country: 'Malaysia', flag: '🇲🇾', currencyName: 'Malaysian Ringgit', nativeName: 'Ringgit Malaysia', currencyCode: 'MYR', currencySymbol: 'RM', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'RM1,234.56', exampleDont: 'RM 1.234,56', rtl: false, subunit: 'sen', subunitRatio: 100 },
+  { id: 'sg', country: 'Singapore', flag: '🇸🇬', currencyName: 'Singapore Dollar', nativeName: 'Singapore Dollar', currencyCode: 'SGD', currencySymbol: 'S$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'S$1,234.56', exampleDont: '1.234,56 S$', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'tw', country: 'Taiwan', flag: '🇹🇼', currencyName: 'New Taiwan Dollar', nativeName: '新台幣 (Xīn Táibì)', currencyCode: 'TWD', currencySymbol: 'NT$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, codePosition: 'before', exampleDo: 'NT$1,234', exampleDont: 'NT$1,234.00', rtl: false, subunit: '分 (fēn)', subunitRatio: 100 },
+  { id: 'hk', country: 'Hong Kong', flag: '🇭🇰', currencyName: 'Hong Kong Dollar', nativeName: '港元 (Gǎng Yuán)', currencyCode: 'HKD', currencySymbol: 'HK$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'HK$1,234.56', exampleDont: '1.234,56 HK$', rtl: false, subunit: '仙 (cent)', subunitRatio: 100 },
 
   // --- Oceania ---
-  { id: 'au', country: 'Australia', flag: '🇦🇺', currencyName: 'Australian Dollar', currencyCode: 'AUD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
-  { id: 'nz', country: 'New Zealand', flag: '🇳🇿', currencyName: 'New Zealand Dollar', currencyCode: 'NZD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
+  { id: 'au', country: 'Australia', flag: '🇦🇺', currencyName: 'Australian Dollar', nativeName: 'Australian Dollar', currencyCode: 'AUD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'nz', country: 'New Zealand', flag: '🇳🇿', currencyName: 'New Zealand Dollar', nativeName: 'New Zealand Dollar', currencyCode: 'NZD', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $', rtl: false, subunit: 'cent', subunitRatio: 100 },
 
   // --- Latin America ---
-  { id: 'br', country: 'Brazil', flag: '🇧🇷', currencyName: 'Brazilian Real', currencyCode: 'BRL', currencySymbol: 'R$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R$ 1.234,56', exampleDont: 'R$1,234.56' },
-  { id: 'ar', country: 'Argentina', flag: '🇦🇷', currencyName: 'Argentine Peso', currencyCode: 'ARS', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1.234,56', exampleDont: '$1,234.56' },
-  { id: 'mx', country: 'Mexico', flag: '🇲🇽', currencyName: 'Mexican Peso', currencyCode: 'MXN', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $' },
-  { id: 'co', country: 'Colombia', flag: '🇨🇴', currencyName: 'Colombian Peso', currencyCode: 'COP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 1.234', exampleDont: '$1,234.00' },
-  { id: 'cl', country: 'Chile', flag: '🇨🇱', currencyName: 'Chilean Peso', currencyCode: 'CLP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 9.990', exampleDont: '$9,990.00' },
+  { id: 'br', country: 'Brazil', flag: '🇧🇷', currencyName: 'Brazilian Real', nativeName: 'Real brasileiro', currencyCode: 'BRL', currencySymbol: 'R$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R$ 1.234,56', exampleDont: 'R$1,234.56', rtl: false, subunit: 'centavo', subunitRatio: 100 },
+  { id: 'ar', country: 'Argentina', flag: '🇦🇷', currencyName: 'Argentine Peso', nativeName: 'Peso argentino', currencyCode: 'ARS', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 2, codePosition: 'before', exampleDo: '$ 1.234,56', exampleDont: '$1,234.56', rtl: false, subunit: 'centavo', subunitRatio: 100 },
+  { id: 'mx', country: 'Mexico', flag: '🇲🇽', currencyName: 'Mexican Peso', nativeName: 'Peso mexicano', currencyCode: 'MXN', currencySymbol: '$', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '$1,234.56', exampleDont: '1.234,56 $', rtl: false, subunit: 'centavo', subunitRatio: 100 },
+  { id: 'co', country: 'Colombia', flag: '🇨🇴', currencyName: 'Colombian Peso', nativeName: 'Peso colombiano', currencyCode: 'COP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 1.234', exampleDont: '$1,234.00', rtl: false, subunit: 'centavo', subunitRatio: 100 },
+  { id: 'cl', country: 'Chile', flag: '🇨🇱', currencyName: 'Chilean Peso', nativeName: 'Peso chileno', currencyCode: 'CLP', currencySymbol: '$', symbolPosition: 'before', symbolSpace: true, decimalSeparator: ',', thousandsSeparator: '.', decimalPlaces: 0, codePosition: 'before', exampleDo: '$ 9.990', exampleDont: '$9,990.00', rtl: false, subunit: 'centavo (not used)', subunitRatio: 100 },
 
   // --- Middle East / Africa ---
-  { id: 'sa', country: 'Saudi Arabia', flag: '🇸🇦', currencyName: 'Saudi Riyal', currencyCode: 'SAR', currencySymbol: '﷼', symbolPosition: 'after', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'after', exampleDo: '1,234.56 ﷼', exampleDont: '﷼1.234,56' },
-  { id: 'il', country: 'Israel', flag: '🇮🇱', currencyName: 'Israeli New Shekel', currencyCode: 'ILS', currencySymbol: '₪', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₪1,234.56', exampleDont: '1.234,56 ₪' },
-  { id: 'ae', country: 'United Arab Emirates', flag: '🇦🇪', currencyName: 'UAE Dirham', currencyCode: 'AED', currencySymbol: 'د.إ', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'AED 1,234.56', exampleDont: '1.234,56 AED' },
-  { id: 'eg', country: 'Egypt', flag: '🇪🇬', currencyName: 'Egyptian Pound', currencyCode: 'EGP', currencySymbol: 'ج.م', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'EGP 1,234.56', exampleDont: '1.234,56 EGP' },
-  { id: 'za', country: 'South Africa', flag: '🇿🇦', currencyName: 'South African Rand', currencyCode: 'ZAR', currencySymbol: 'R', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R 1 234.56', exampleDont: 'R1,234.56' },
-  { id: 'ng', country: 'Nigeria', flag: '🇳🇬', currencyName: 'Nigerian Naira', currencyCode: 'NGN', currencySymbol: '₦', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₦1,234.56', exampleDont: '1.234,56 ₦' },
+  { id: 'sa', country: 'Saudi Arabia', flag: '🇸🇦', currencyName: 'Saudi Riyal', nativeName: 'ريال سعودي', currencyCode: 'SAR', currencySymbol: '﷼', symbolPosition: 'after', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'after', exampleDo: '1,234.56 ﷼', exampleDont: '﷼1.234,56', rtl: true, subunit: 'هللة (halala)', subunitRatio: 100 },
+  { id: 'il', country: 'Israel', flag: '🇮🇱', currencyName: 'Israeli New Shekel', nativeName: 'שקל חדש (Shekel)', currencyCode: 'ILS', currencySymbol: '₪', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₪1,234.56', exampleDont: '1.234,56 ₪', rtl: true, subunit: 'אגורה (agora)', subunitRatio: 100 },
+  { id: 'ae', country: 'United Arab Emirates', flag: '🇦🇪', currencyName: 'UAE Dirham', nativeName: 'درهم إماراتي', currencyCode: 'AED', currencySymbol: 'د.إ', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'AED 1,234.56', exampleDont: '1.234,56 AED', rtl: true, subunit: 'فلس (fils)', subunitRatio: 100 },
+  { id: 'eg', country: 'Egypt', flag: '🇪🇬', currencyName: 'Egyptian Pound', nativeName: 'جنيه مصري', currencyCode: 'EGP', currencySymbol: 'ج.م', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: 'EGP 1,234.56', exampleDont: '1.234,56 EGP', rtl: true, subunit: 'قرش (piastre)', subunitRatio: 100 },
+  { id: 'za', country: 'South Africa', flag: '🇿🇦', currencyName: 'South African Rand', nativeName: 'Suid-Afrikaanse rand', currencyCode: 'ZAR', currencySymbol: 'R', symbolPosition: 'before', symbolSpace: true, decimalSeparator: '.', thousandsSeparator: ' ', decimalPlaces: 2, codePosition: 'before', exampleDo: 'R 1 234.56', exampleDont: 'R1,234.56', rtl: false, subunit: 'cent', subunitRatio: 100 },
+  { id: 'ng', country: 'Nigeria', flag: '🇳🇬', currencyName: 'Nigerian Naira', nativeName: 'Naira', currencyCode: 'NGN', currencySymbol: '₦', symbolPosition: 'before', symbolSpace: false, decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, codePosition: 'before', exampleDo: '₦1,234.56', exampleDont: '1.234,56 ₦', rtl: false, subunit: 'kobo', subunitRatio: 100 },
 ];
 
 window.GROUPS = {
@@ -1194,8 +1402,158 @@ function ChipRow({ label, groups, selected, setSelected }) {
     </div>);
 }
 
+// ---------- Paywall Mockup ----------
+function PaywallMockup({ country }) {
+  const c = country;
+  const plans = [
+    { label: 'Monthly', price: 9.99, note: 'billed monthly' },
+    { label: 'Yearly', price: 59.99, note: 'billed once a year', featured: true },
+    { label: 'Lifetime', price: 149.99, note: 'one-time purchase' },
+  ];
+  return (
+    <div className="paywall-phone">
+      <div className="pw-app-icon">💸</div>
+      <div>
+        <div className="pw-title">Go Pro</div>
+        <div className="pw-subtitle">Unlock all features &amp; formats</div>
+      </div>
+      <div className="pw-plans">
+        {plans.map((p) => (
+          <div key={p.label} className={`pw-plan ${p.featured ? 'pw-plan-featured' : ''}`}>
+            <div>
+              <div className="pw-plan-label">{p.label}</div>
+              <div className="pw-plan-note">{p.note}</div>
+            </div>
+            <div className="pw-plan-price">{formatWithSymbol(p.price, c)}</div>
+          </div>
+        ))}
+      </div>
+      <div className="pw-cta">Continue</div>
+      <div className="pw-fine-print">Cancel anytime · Restore purchase</div>
+    </div>
+  );
+}
+
+// ---------- Detail View ----------
+function DetailView({ country, onClose }) {
+  const c = country;
+  const [exiting, setExiting] = React.useState(false);
+
+  const handleClose = () => {
+    setExiting(true);
+    setTimeout(onClose, 230);
+  };
+
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  const specs = [
+    { k: 'Symbol', v: c.currencySymbol || c.currencyCode },
+    { k: 'Symbol position', v: `${c.symbolPosition}${c.symbolSpace ? ' + space' : ''}` },
+    { k: 'Decimal separator', v: c.decimalSeparator === '.' ? 'dot ( . )' : 'comma ( , )' },
+    { k: 'Thousands separator', v: c.thousandsSeparator === ',' ? 'comma ( , )' : c.thousandsSeparator === '.' ? 'dot ( . )' : c.thousandsSeparator === ' ' ? 'space ( ␣ )' : c.thousandsSeparator === "'" ? "apostrophe ( ' )" : 'none' },
+    { k: 'Decimal places', v: c.decimalPlaces === 0 ? 'none (whole numbers)' : '2' },
+    { k: 'Grouping', v: c.indianGrouping ? 'Indian lakh system' : 'Standard (thousands)' },
+    { k: 'Subunit', v: c.subunit },
+    { k: 'Direction', v: c.rtl ? 'Right-to-left (RTL)' : 'Left-to-right (LTR)' },
+  ];
+
+  const prices = [9.99, 1234.56, 123456.78];
+  const labels = ['Small', 'Medium', 'Large'];
+
+  return (
+    <div className={`detail-overlay${exiting ? ' detail-exit' : ''}`} role="dialog" aria-modal="true">
+      <div className="detail-topbar">
+        <button className="detail-back" onClick={handleClose}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M11 6l-6 6 6 6"/>
+          </svg>
+          Back to results
+        </button>
+      </div>
+
+      <div className="detail-body">
+        {/* Hero */}
+        <div className="detail-hero">
+          <div className="detail-flag">{c.flag}</div>
+          <div className="detail-hero-text">
+            <h1>{c.country}</h1>
+            <div className="detail-native">
+              <span className="detail-native-name">{c.nativeName}</span>
+              <span className="card-code">{c.currencyCode}</span>
+              {c.rtl && <span className="detail-rtl-badge">RTL</span>}
+            </div>
+          </div>
+        </div>
+
+        {/* Formatting specs */}
+        <div>
+          <div className="detail-section-title">Formatting rules</div>
+          <div className="detail-specs">
+            {specs.map((s) => (
+              <div key={s.k} className="detail-spec">
+                <span className="detail-spec-k">{s.k}</span>
+                <span className="detail-spec-v">{s.v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Examples */}
+        <div>
+          <div className="detail-section-title">Price examples</div>
+          <div className="examples">
+            <div className="ex-head">
+              <span>Amount</span>
+              <span>Symbol format</span>
+              <span>Code format</span>
+            </div>
+            {prices.map((p, i) => (
+              <div className="ex-row" key={i}>
+                <span className="ex-label">{labels[i]}</span>
+                <span className="ex-mono">{formatWithSymbol(p, c)}</span>
+                <span className="ex-mono ex-mono-dim">{formatWithCode(p, c)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Do / Don't */}
+        <div>
+          <div className="detail-section-title">Do's &amp; Don'ts</div>
+          <div className="dodont">
+            <div className="dd dd-do">
+              <span className="dd-mark" aria-hidden>✓</span>
+              <span className="dd-label">Correct</span>
+              <span className="dd-val">{c.exampleDo}</span>
+            </div>
+            <div className="dd dd-dont">
+              <span className="dd-mark" aria-hidden>✗</span>
+              <span className="dd-label">Avoid</span>
+              <span className="dd-val">{c.exampleDont}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Paywall mockup */}
+        <div>
+          <div className="detail-section-title">Mobile paywall preview</div>
+          <div className="paywall-wrap">
+            <div className="paywall-devices">
+              <PaywallMockup country={c} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Card ----------
-function CurrencyCard({ country, onRemove }) {
+function CurrencyCard({ country, onRemove, onDetail }) {
   const c = country;
   const [exiting, setExiting] = React.useState(false);
   const handleRemove = () => {
@@ -1216,8 +1574,8 @@ function CurrencyCard({ country, onRemove }) {
   { k: 'Decimal places', v: c.decimalPlaces === 0 ? '0 (no fraction)' : '2' }];
 
   return (
-    <article className={`card ${exiting ? 'card-exit' : ''}`}>
-      <button className="card-close" onClick={handleRemove} aria-label={`Remove ${c.country}`}>
+    <article className={`card card-clickable ${exiting ? 'card-exit' : ''}`} onClick={onDetail} style={{ cursor: 'pointer' }}>
+      <button className="card-close" onClick={(e) => { e.stopPropagation(); handleRemove(); }} aria-label={`Remove ${c.country}`}>
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <path d="M6 6l12 12M18 6 6 18"/>
         </svg>
@@ -1276,20 +1634,20 @@ function CurrencyCard({ country, onRemove }) {
 }
 
 // ---------- Results ----------
-function Results({ selected, onEdit, setSelected }) {
+function Results({ selected, onEdit, setSelected, onDetail }) {
   const countries = selected.map((id) => COUNTRY_BY_ID[id]).filter(Boolean);
 
   return (
     <section className="results">
       <div className="edit-bar">
         <div className="edit-meta">
-          <strong>{countries.length}</strong>&nbsp;{countries.length === 1 ? 'country' : 'countries'}
+          <strong>{countries.length}</strong>&nbsp;{countries.length === 1 ? 'country' : 'countries'}&nbsp;<span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>· tap a card to expand</span>
         </div>
         <button className="clear-results-btn" onClick={() => setSelected([])}>Clear all</button>
       </div>
 
       <div className="cards-grid">
-        {countries.map((c) => <CurrencyCard key={c.id} country={c} onRemove={() => setSelected(prev => prev.filter(id => id !== c.id))} />)}
+        {countries.map((c) => <CurrencyCard key={c.id} country={c} onRemove={() => setSelected(prev => prev.filter(id => id !== c.id))} onDetail={() => onDetail(c.id)} />)}
       </div>
     </section>);
 }
@@ -1355,6 +1713,7 @@ function App() {
   const [view, setView] = useState(() => localStorage.getItem('mmm.view') || 'landing');
   const [tweaks, setTweaks] = useState(TWEAKS);
   const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [detailId, setDetailId] = useState(null);
 
   window.__tweaks = tweaks;
 
@@ -1443,7 +1802,8 @@ function App() {
         </div>
       </main>
 
-      {view === 'results' && <Results selected={selected} onEdit={showLanding} setSelected={setSelected} />}
+      {view === 'results' && <Results selected={selected} onEdit={showLanding} setSelected={setSelected} onDetail={setDetailId} />}
+      {detailId && COUNTRY_BY_ID[detailId] && <DetailView country={COUNTRY_BY_ID[detailId]} onClose={() => setDetailId(null)} />}
 
       <footer className="foot">
         <div>Data based on <span className="mono">ISO 4217</span>, <span className="mono">CLDR</span>, and locale conventions.</div>
