@@ -186,9 +186,16 @@ a { color: inherit; }
   color: var(--ink-2);
   font-size: 12px;
   padding: 5px 10px;
-  cursor: default;
+  cursor: pointer;
   animation: tokenIn 0.2s var(--ease-out) both;
+  transition: background 0.12s var(--ease-out), color 0.12s var(--ease-out);
+  border-radius: 999px;
+  font-weight: 500;
 }
+@media (hover: hover) and (pointer: fine) {
+  .token-overflow:hover { background: var(--ink); color: #fff; }
+}
+.token-collapse { background: var(--bg-2); }
 .token-x {
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; border-radius: 50%;
@@ -1257,6 +1264,7 @@ function SearchCombobox({ selected, setSelected }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
+  const [showAll, setShowAll] = useState(false);
   const wrapRef = useRef(null);
   const inputRef = useRef(null);
   const listRef = useRef(null);
@@ -1318,7 +1326,7 @@ function SearchCombobox({ selected, setSelected }) {
           <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
         </svg>
         <div className="chips-input">
-          {selected.slice(0, 4).map((id) => {
+          {(showAll ? selected : selected.slice(0, 4)).map((id) => {
             const c = COUNTRY_BY_ID[id];
             if (!c) return null;
             return (
@@ -1332,10 +1340,15 @@ function SearchCombobox({ selected, setSelected }) {
                 </button>
               </span>);
           })}
-          {selected.length > 4 && (
-            <span className="token token-overflow" title={selected.slice(4).map(id => COUNTRY_BY_ID[id]?.country).filter(Boolean).join(', ')}>
+          {selected.length > 4 && !showAll && (
+            <button className="token token-overflow" onClick={(e) => {e.stopPropagation();setShowAll(true);}}>
               +{selected.length - 4} more
-            </span>
+            </button>
+          )}
+          {showAll && selected.length > 4 && (
+            <button className="token token-overflow token-collapse" onClick={(e) => {e.stopPropagation();setShowAll(false);}}>
+              show less
+            </button>
           )}
           <input
             ref={inputRef}
@@ -1595,7 +1608,7 @@ function CurrencyCard({ country, onRemove, onDetail }) {
         <div className="card-flag">{c.flag}</div>
         <div className="card-head-text">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="card-expand-arrow">↗</span>{c.country}
+            {c.country}<span className="card-expand-arrow">↗</span>
           </h3>
           <div className="card-cur">
             <span>{c.currencyName}</span>
@@ -1720,18 +1733,13 @@ function TweaksPanel({ tweaks, setTweak, visible, onClose }) {
 
 // ---------- App ----------
 function App() {
-  const [selected, setSelected] = useState(() => {
-    try {return JSON.parse(localStorage.getItem('mmm.selected') || '[]');} catch {return [];}
-  });
-  const [view, setView] = useState(() => localStorage.getItem('mmm.view') || 'landing');
+  const [selected, setSelected] = useState([]);
+  const [view, setView] = useState('landing');
   const [tweaks, setTweaks] = useState(TWEAKS);
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [detailId, setDetailId] = useState(null);
 
   window.__tweaks = tweaks;
-
-  useEffect(() => {localStorage.setItem('mmm.selected', JSON.stringify(selected));}, [selected]);
-  useEffect(() => {localStorage.setItem('mmm.view', view);}, [view]);
 
   useEffect(() => {
     const onMsg = (e) => {
