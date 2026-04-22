@@ -858,15 +858,13 @@ button:focus-visible, input:focus-visible {
 }
 
 /* Card clickable hint */
-.card-clickable::after {
-  content: '↗';
-  position: absolute; bottom: 14px; right: 46px;
+.card-expand-arrow {
   font-size: 13px; color: var(--ink-4);
   transition: color 0.18s var(--ease-out), transform 0.18s var(--ease-out);
-  pointer-events: none;
+  display: inline-block;
 }
 @media (hover: hover) and (pointer: fine) {
-  .card-clickable:hover::after { color: var(--accent-2); transform: translate(2px, -2px); }
+  .card-clickable:hover .card-expand-arrow { color: var(--accent-2); transform: translate(2px, -2px); }
 }
 
 /* ---------- Detail view ---------- */
@@ -1596,7 +1594,9 @@ function CurrencyCard({ country, onRemove, onDetail }) {
       <header className="card-head">
         <div className="card-flag">{c.flag}</div>
         <div className="card-head-text">
-          <h3>{c.country}</h3>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="card-expand-arrow">↗</span>{c.country}
+          </h3>
           <div className="card-cur">
             <span>{c.currencyName}</span>
             <span className="card-code">{c.currencyCode}</span>
