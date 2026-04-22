@@ -599,21 +599,11 @@ a { color: inherit; }
   background: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 20px 24px;
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
-}
-.plugin-promo-icon {
-  flex-shrink: 0;
-  width: 52px; height: 52px;
-  border-radius: 13px;
-  overflow: hidden;
-}
-.plugin-promo-icon img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
+  min-height: 0;
 }
 .plugin-promo-text { flex: 1; min-width: 0; }
 .plugin-promo-badge {
@@ -640,7 +630,7 @@ a { color: inherit; }
 }
 @media (max-width: 768px) {
   .plugin-promo { padding: 20px 20px 36px; }
-  .plugin-promo-inner { padding: 16px 20px; }
+  .plugin-promo-inner { padding: 8px 20px; }
 }
 
 /* ---------- Footer ---------- */
@@ -1892,15 +1882,12 @@ function App() {
       {view === 'landing' && (
         <div className="plugin-promo">
           <div className="plugin-promo-inner">
-            <div className="plugin-promo-icon">
-              <img src="plugin-icon.png" alt="Currency Format Checker plugin icon" />
-            </div>
             <div className="plugin-promo-text">
               <div className="plugin-promo-badge">
                 <span className="plugin-promo-badge-dot"/>
                 Coming soon
               </div>
-              <h2>Currency Format Checker for Figma</h2>
+              <h2>Currency Format Checker — Figma Plugin</h2>
               <p>Format and convert prices directly inside Figma — coming to Figma Community.</p>
             </div>
           </div>
