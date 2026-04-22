@@ -43,7 +43,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -840,7 +840,7 @@ button:focus-visible, input:focus-visible {
   .dd-val { font-size: 12px; }
 
   /* Footer */
-  .foot { padding: 28px 20px; font-size: 11px; flex-direction: column; gap: 8px; }
+  .foot { padding: 28px 20px; font-size: 11px; flex-direction: column; gap: 8px; text-align: center; align-items: center; }
 
   /* Tweaks panel */
   .tweaks-panel { width: calc(100vw - 32px); right: 16px; bottom: 16px; }
