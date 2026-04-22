@@ -181,6 +181,14 @@ a { color: inherit; }
 }
 @keyframes tokenIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .token-flag { font-size: 13px; }
+.token-overflow {
+  background: var(--bg-3);
+  color: var(--ink-2);
+  font-size: 12px;
+  padding: 5px 10px;
+  cursor: default;
+  animation: tokenIn 0.2s var(--ease-out) both;
+}
 .token-x {
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; border-radius: 50%;
@@ -1312,13 +1320,13 @@ function SearchCombobox({ selected, setSelected }) {
           <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
         </svg>
         <div className="chips-input">
-          {selected.map((id) => {
+          {selected.slice(0, 4).map((id) => {
             const c = COUNTRY_BY_ID[id];
             if (!c) return null;
             return (
               <span className="token" key={id}>
                 <span className="token-flag">{c.flag}</span>
-                <span className="token-label">{c.country}</span>
+                <span className="token-label">{c.currencyCode}</span>
                 <button className="token-x" onClick={(e) => {e.stopPropagation();remove(id);}} aria-label={`Remove ${c.country}`}>
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
                     <path d="M6 6l12 12M18 6 6 18" />
@@ -1326,6 +1334,11 @@ function SearchCombobox({ selected, setSelected }) {
                 </button>
               </span>);
           })}
+          {selected.length > 4 && (
+            <span className="token token-overflow" title={selected.slice(4).map(id => COUNTRY_BY_ID[id]?.country).filter(Boolean).join(', ')}>
+              +{selected.length - 4} more
+            </span>
+          )}
           <input
             ref={inputRef}
             className="combo-native"
