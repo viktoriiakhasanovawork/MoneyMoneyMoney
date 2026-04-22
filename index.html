@@ -147,8 +147,8 @@ a { color: inherit; }
 .search-icon { color: var(--ink-3); margin-top: 9px; flex-shrink: 0; transition: color 0.2s var(--ease-out); }
 .combo-input:focus-within .search-icon { color: #6366f1; }
 .chips-input {
-  flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
-  padding-top: 2px;
+  flex: 1; display: flex; flex-wrap: nowrap; gap: 6px; align-items: center;
+  padding-top: 2px; overflow: hidden;
 }
 .combo-native {
   border: 0; outline: 0; background: transparent;
@@ -588,6 +588,94 @@ a { color: inherit; }
 }
 .dd-dont .dd-val { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--danger) 40%, transparent); }
 
+/* ---------- Plugin Promo ---------- */
+.plugin-promo {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 64px 32px;
+}
+.plugin-promo-inner {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 6%, var(--bg-2)) 0%, var(--bg-2) 60%, color-mix(in srgb, var(--accent) 4%, var(--bg-2)) 100%);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 48px 56px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.plugin-promo-inner::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 10%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+.plugin-promo-icon {
+  flex-shrink: 0;
+  width: 72px; height: 72px;
+  background: var(--accent);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.plugin-promo-icon svg { color: white; }
+.plugin-promo-text { flex: 1; }
+.plugin-promo-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+  color: var(--accent-2);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 25%, transparent);
+  border-radius: 100px;
+  padding: 3px 10px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.plugin-promo-badge-dot {
+  width: 6px; height: 6px;
+  background: var(--accent-2);
+  border-radius: 50%;
+}
+.plugin-promo-text h2 {
+  font-size: 22px; font-weight: 700; color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+.plugin-promo-text p {
+  font-size: 14px; color: var(--ink-2); line-height: 1.6;
+  margin: 0;
+  max-width: 480px;
+}
+.plugin-promo-cta {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+}
+.plugin-promo-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent);
+  color: white;
+  border: none; border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px; font-weight: 600;
+  cursor: default;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+.plugin-promo-note {
+  font-size: 11px; color: var(--ink-3);
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .plugin-promo { padding: 32px 20px; }
+  .plugin-promo-inner { flex-direction: column; padding: 32px 24px; gap: 24px; align-items: flex-start; }
+  .plugin-promo-inner::before { display: none; }
+  .plugin-promo-cta { align-items: flex-start; }
+  .plugin-promo-text h2 { font-size: 18px; }
+}
+
 /* ---------- Footer ---------- */
 .foot {
   max-width: 1024px;
@@ -879,8 +967,11 @@ button:focus-visible, input:focus-visible {
   position: fixed; inset: 0; z-index: 50;
   background: var(--bg);
   overflow-y: auto;
+  overflow-x: hidden;
   animation: detailIn 0.35s var(--ease-out) both;
 }
+/* Lock body scroll while detail overlay is open */
+body.detail-open { overflow: hidden; }
 @keyframes detailIn {
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }
@@ -1474,6 +1565,11 @@ function DetailView({ country, onClose }) {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  React.useEffect(() => {
+    document.body.classList.add('detail-open');
+    return () => document.body.classList.remove('detail-open');
+  }, []);
+
   const specs = [
     { k: 'Symbol', v: c.currencySymbol || c.currencyCode },
     { k: 'Symbol position', v: `${c.symbolPosition}${c.symbolSpace ? ' + space' : ''}` },
@@ -1825,6 +1921,38 @@ function App() {
 
       {view === 'results' && <Results selected={selected} onEdit={showLanding} setSelected={setSelected} onDetail={setDetailId} />}
       {detailId && COUNTRY_BY_ID[detailId] && <DetailView country={COUNTRY_BY_ID[detailId]} onClose={() => setDetailId(null)} />}
+
+      {view === 'landing' && (
+        <div className="plugin-promo">
+          <div className="plugin-promo-inner">
+            <div className="plugin-promo-icon">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div className="plugin-promo-text">
+              <div className="plugin-promo-badge">
+                <span className="plugin-promo-badge-dot"/>
+                Coming soon
+              </div>
+              <h2>Currency Format Checker for Figma</h2>
+              <p>Format and convert prices directly inside Figma. Select any text layer, pick a target locale, and apply — the plugin rewrites only the price, preserving surrounding text like "/week" or "per month".</p>
+            </div>
+            <div className="plugin-promo-cta">
+              <div className="plugin-promo-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+                Install plugin
+              </div>
+              <div className="plugin-promo-note">Free · Available on Figma Community</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="foot">
         <div>Data based on <span className="mono">ISO 4217</span>, <span className="mono">CLDR</span>, and locale conventions.</div>
